@@ -1,27 +1,19 @@
 package com.mycompany.ocxee.view;
 
-import com.mycompany.ocxee.DAO.PenyelamDAO;
-import com.mycompany.ocxee.DAO.DestinasiDAO;
-import com.mycompany.ocxee.DAO.PesanTiketDAO;
-import com.mycompany.ocxee.model.Penyelam;
+import com.mycompany.ocxee.controller.PenyelamController;
 import java.util.Scanner;
 
 public class PenyelamView {
     private Scanner scanner;
-    private PenyelamDAO penyelamDAO;
-    private DestinasiDAO destinasiDAO;
-    private PesanTiketDAO pesanTiketDAO; // Perbaiki nama variabel
-    private Beranda beranda;
+    private PenyelamController penyelamController;
 
-    public PenyelamView(PenyelamDAO penyelamDAO, DestinasiDAO destinasiDAO, PesanTiketDAO pesanTiketDAO) {
+    public PenyelamView(PenyelamController penyelamController) {
         this.scanner = new Scanner(System.in);
-        this.penyelamDAO = penyelamDAO;
-        this.destinasiDAO = destinasiDAO;
-        this.pesanTiketDAO = pesanTiketDAO;
-        this.beranda = new Beranda(pesanTiketDAO, destinasiDAO, penyelamDAO); // Inisialisasi beranda dengan DAO yang benar
+        this.penyelamController = penyelamController;
     }
 
-    public void showMenu() {
+    // Change return type to boolean to indicate login success/failure
+    public boolean showMenu() {
         while (true) {
             System.out.println("=== Aplikasi Penyelam ===");
             System.out.println("1. Daftar");
@@ -36,11 +28,14 @@ public class PenyelamView {
                     signIn();
                     break;
                 case 2:
-                    login();
+                    // Login logic - return true if login is successful
+                    if (login()) {
+                        return true; // Login berhasil
+                    }
                     break;
                 case 3:
                     System.out.println("Keluar dari aplikasi.");
-                    return;
+                    return false; // User chose to exit
                 default:
                     System.out.println("Pilihan tidak valid. Silakan coba lagi.");
             }
@@ -50,64 +45,28 @@ public class PenyelamView {
     private void signIn() {
         System.out.print("Masukkan ID Penyelam: ");
         String idPenyelam = scanner.nextLine();
-
-        // Check if ID already exists
-        if (penyelamDAO.getPenyelam(idPenyelam) != null) {
-            System.out.println("ID Penyelam sudah terdaftar. Silakan gunakan ID lain.");
-            return;
-        }
-
         System.out.print("Masukkan Nama: ");
         String nama = scanner.nextLine();
-        System.out.print("Masukkan Umur: ");
+        System.out.print("Masukkan Umur (Umur harus antara 18 dan 60 tahun): ");
         int umur = scanner.nextInt();
         scanner.nextLine(); // Menyerap newline
-
-        // Age validation
-        if (umur < 18 || umur > 60) {
-            System.out.println("Umur harus antara 18 dan 60 tahun.");
-            return;
-        }
-
         System.out.print("Masukkan Alamat: ");
         String alamat = scanner.nextLine();
-        System.out.print("Masukkan Password: ");
+        System.out.print("Masukkan Password (Password harus terdiri dari 6-10 karakter): ");
         String password = scanner.nextLine();
-
-        // Password validation
-        if (password.length() < 6 || password.length() > 10) {
-            System.out.println("Password harus terdiri dari 6 hingga 10 karakter.");
-            return;
-        }
-
-        System.out.print("Masukkan No HP: ");
+        System.out.print("Masukkan No HP (No HP harus terdiri dari 11-13 angka): ");
         String noHp = scanner.nextLine();
 
-        // Phone number validation
-        if (!noHp.matches("\\d{11}")) {
-            System.out.println("No HP harus terdiri dari 11 angka.");
-            return;
-        }
-
-        // Membuat objek Penyelam dan menyimpannya ke database
-        Penyelam penyelam = new Penyelam(idPenyelam, nama, umur, alamat, password, noHp);
-        penyelamDAO.insertPenyelam(penyelam);
-        System.out.println("Penyelam berhasil didaftarkan!");
+        // Memanggil controller untuk registrasi
+        penyelamController.registerPenyelam(idPenyelam, nama, umur, alamat, password, noHp);
     }
-
-    private void login() {
+    private boolean login() {
         System.out.print("Masukkan ID Penyelam: ");
         String idPenyelam = scanner.nextLine();
         System.out.print("Masukkan Password: ");
         String password = scanner.nextLine();
 
-        // Mengambil data penyelam dari database
-        Penyelam penyelam = penyelamDAO.getPenyelam(idPenyelam);
-        if (penyelam != null && penyelam.getPassword().equals(password)) {
-            System.out.println("Login berhasil! Selamat datang, " + penyelam.getNama());
-            beranda.showBeranda(); // Memanggil beranda setelah login berhasil
-        } else {
-            System.out.println("ID atau password salah. Silakan coba lagi.");
-        }
+        // Handle login logic through the controller
+        return penyelamController.loginPenyelam(idPenyelam, password);
     }
 }
