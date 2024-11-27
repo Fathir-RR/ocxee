@@ -1,0 +1,54 @@
+package com.mycompany.ocxee.controller;
+
+import com.mycompany.ocxee.DAO.PenyelamDAO;
+import com.mycompany.ocxee.model.Penyelam;
+
+public class PenyelamController {
+    private PenyelamDAO penyelamDAO;
+
+    public PenyelamController(PenyelamDAO penyelamDAO) {
+        this.penyelamDAO = penyelamDAO;
+    }
+
+    public boolean registerPenyelam(String idPenyelam, String nama, int umur, String alamat, String password, String noHp) {
+        // Validasi ID Penyelam unik
+        if (penyelamDAO.getPenyelam(idPenyelam) != null) {
+            System.out.println("ID Penyelam sudah terdaftar. Silakan gunakan ID lain.");
+            return false;
+        }
+
+        // Validasi umur
+        if (umur < 18 || umur > 60) {
+            System.out.println("Umur harus antara 18 dan 60 tahun.");
+            return false;
+        }
+
+        // Validasi password
+        if (password.length() < 6 || password.length() > 10) {
+            System.out.println("Password harus terdiri dari 6 hingga 10 karakter.");
+            return false;
+        }
+
+        // Validasi nomor HP
+        if (noHp.length() < 10 || noHp.length() > 13 ) {
+            System.out.println("No HP harus terdiri dari 11-13 angka.");
+            return false;
+        }
+
+        // Membuat objek Penyelam dan menyimpan ke database
+        Penyelam penyelam = new Penyelam(idPenyelam, nama, umur, alamat, password, noHp);
+        penyelamDAO.insertPenyelam(penyelam);
+        System.out.println("Penyelam berhasil didaftarkan!");
+        return true;
+    }
+
+    public boolean loginPenyelam(String idPenyelam, String password) {
+        Penyelam penyelam = penyelamDAO.getPenyelam(idPenyelam);
+        if (penyelam != null && penyelam.getPassword().equals(password)) {
+            System.out.println("Login berhasil! Selamat datang, " + penyelam.getNama());
+            return true;
+        }
+        System.out.println("ID atau password salah. Silakan coba lagi.");
+        return false;
+    }
+}
