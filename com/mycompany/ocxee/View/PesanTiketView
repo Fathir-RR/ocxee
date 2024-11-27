@@ -20,7 +20,7 @@ public class PesanTiketView {
             System.out.print("Masukkan ID Penyelam: ");
             int idPenyelam = scanner.nextInt();
 
-            System.out.print("Masukkan ID Destinasi: ");
+            System.out.print("Masukkan ID Destinasi (1 , 2, 3): ");
             int idDestinasi = scanner.nextInt();
 
             System.out.print("Masukkan Tanggal (YYYY-MM-DD): ");
@@ -30,7 +30,7 @@ public class PesanTiketView {
             System.out.print("Masukkan Waktu Sesi (1: Pagi, 2: Siang, 3: Sore): ");
             int waktu = scanner.nextInt();
 
-            System.out.print("Masukkan Jumlah Tiket: ");
+            System.out.print("Masukkan Jumlah Tiket (Maksimal 4): ");
             int quantity = scanner.nextInt();
 
             // Delegasikan ke controller
