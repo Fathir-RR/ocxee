@@ -28,7 +28,7 @@ public class PenyelamDAO {
             preparedStatement.setInt(3, penyelam.getUmur());
             preparedStatement.setString(4, penyelam.getAlamat());
             preparedStatement.setString(5, penyelam.getPassword());
-            preparedStatement.setString(6, penyelam.getNoHp()); // Menggunakan no_hp
+            preparedStatement.setString(6, penyelam.getNoHp());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -38,7 +38,7 @@ public class PenyelamDAO {
     // Mendapatkan penyelam berdasarkan id
     public Penyelam getPenyelam(String id) {
         Penyelam penyelam = null;
-        String sql = "SELECT * FROM penyelam WHERE id_penyelam = ?";
+        String sql = "SELECT * FROM penyelam WHERE id_penyelam = ?";  // Query untuk mendapatkan penyelam berdasarkan ID
         
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -51,7 +51,7 @@ public class PenyelamDAO {
                     resultSet.getInt("umur"),
                     resultSet.getString("alamat"),
                     resultSet.getString("password"),
-                    resultSet.getString("no_hp") // Mengambil no_hp
+                    resultSet.getString("no_hp")  // Mengambil no_hp
                 );
             }
         } catch (SQLException e) {
