@@ -1,0 +1,76 @@
+package com.mycompany.ocxee.view;
+
+import com.mycompany.ocxee.controller.PesanTiketController;
+import java.sql.Date;
+import java.util.Scanner;
+
+public class PesanTiketView {
+    private final Scanner scanner;
+    private final PesanTiketController controller;
+
+    public PesanTiketView(PesanTiketController controller) {
+        this.controller = controller;
+        this.scanner = new Scanner(System.in);
+    }
+    
+
+    public void displayForm() {
+        try {
+            System.out.println("=== Pemesanan Tiket ===");
+
+            System.out.print("Masukkan ID Penyelam: ");
+            int idPenyelam = scanner.nextInt();
+
+            System.out.print("Masukkan ID Destinasi (1, 2, 3): ");
+            int idDestinasi = scanner.nextInt();
+
+            // Set price based on destination
+            int harga = 0;
+            switch (idDestinasi) {
+                case 1:
+                    harga = 500000;
+                    break;
+                case 2:
+                    harga = 750000;
+                    break;
+                case 3:
+                    harga = 1000000;
+                    break;
+                default:
+                    System.out.println("Destinasi tidak valid! Pemesanan dibatalkan.");
+                    return;  // Jika destinasi tidak valid, batalkan pemesanan
+            }
+
+            System.out.println("Harga untuk destinasi " + idDestinasi + ": " + harga);
+
+            System.out.print("Masukkan Tanggal (YYYY-MM-DD): ");
+            String tanggalInput = scanner.next();
+            
+            // Mengonversi String ke java.sql.Date
+            Date tanggal = Date.valueOf(tanggalInput);  // Menggunakan Date.valueOf()
+
+            System.out.print("Masukkan Waktu Sesi (1: Pagi, 2: Siang, 3: Sore): ");
+            int waktu = scanner.nextInt();
+
+            System.out.print("Masukkan Jumlah Tiket (Maksimal 4): ");
+            int quantity = scanner.nextInt();
+            
+            // Validasi jumlah tiket
+            if (quantity < 1 || quantity > 4) {
+                System.out.println("Jumlah tiket harus antara 1 hingga 4.");
+                return;  // Batalkan pemesanan jika jumlah tiket tidak valid
+            }
+
+            // Total price calculation
+            int totalPrice = harga * quantity;
+            System.out.println("Harga Total: " + totalPrice);
+
+            // Panggil controller untuk memesan tiket
+            controller.pesanTiket(idPenyelam, idDestinasi, tanggal, waktu, quantity, harga);
+
+            System.out.println("Tiket berhasil dipesan!");
+        } catch (Exception e) {
+            System.err.println("Terjadi kesalahan: " + e.getMessage());
+        }
+    }
+}
