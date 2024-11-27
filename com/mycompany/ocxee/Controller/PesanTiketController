@@ -6,7 +6,6 @@ import java.sql.Date;
 
 public class PesanTiketController {
     private PesanTiketDAO tiketDAO;
-
     public PesanTiketController(PesanTiketDAO tiketDAO) {
         this.tiketDAO = tiketDAO;
     }
