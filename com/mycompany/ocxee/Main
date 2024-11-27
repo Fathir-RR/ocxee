@@ -4,6 +4,8 @@ import com.mycompany.ocxee.DAO.DestinasiDAO;
 import com.mycompany.ocxee.DAO.PenyelamDAO;
 import com.mycompany.ocxee.DAO.PesanTiketDAO;
 import com.mycompany.ocxee.controller.PesanTiketController;
+import com.mycompany.ocxee.controller.BerandaController;
+import com.mycompany.ocxee.controller.PenyelamController;
 import com.mycompany.ocxee.view.Beranda;
 import com.mycompany.ocxee.view.PenyelamView;
 import com.mycompany.ocxee.view.PesanTiketView;
@@ -14,15 +16,17 @@ public class Main {
         PenyelamDAO penyelamDAO = new PenyelamDAO();
         DestinasiDAO destinasiDAO = new DestinasiDAO();
         PesanTiketDAO pesanTiketDAO = new PesanTiketDAO();
-
-        // Inisialisasi view
-        PenyelamView penyelamView = new PenyelamView(penyelamDAO, destinasiDAO, pesanTiketDAO);
+        
+        //inisialisasi controller dan view yang digunakan
+        PenyelamController penyelamController = new PenyelamController(penyelamDAO);
+        PenyelamView penyelamView = new PenyelamView(penyelamController);
+        BerandaController berandaController = new BerandaController(pesanTiketDAO, destinasiDAO, penyelamDAO, penyelamView);
 
         // Menampilkan menu login
         penyelamView.showMenu();
 
         // Setelah login berhasil, tampilkan beranda
-        Beranda beranda = new Beranda(pesanTiketDAO, destinasiDAO, penyelamDAO);
+        Beranda beranda = new Beranda(berandaController, penyelamView);
         beranda.showBeranda();
     }
 }
