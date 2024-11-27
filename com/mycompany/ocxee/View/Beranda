@@ -76,7 +76,7 @@ public class Beranda {
         System.out.println("Tanggal: " + tiket.getTanggal());
         System.out.println("Waktu: " + tiket.getWaktu());
         System.out.println("Jumlah Tiket: " + tiket.getQuantity());
-        System.out.println("Harga: " + tiket.getHarga());
+        System.out.println("Total Harga: " + tiket.getTotalHarga());
         System.out.println("---------------------------");
     }
 
