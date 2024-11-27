@@ -1,0 +1,112 @@
+package com.mycompany.ocxee.DAO;
+
+import com.mycompany.ocxee.model.PesanTiket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class PesanTiketDAO {
+    private final String jdbcURL = "jdbc:mysql://localhost:3306/oxcee";
+    private final String jdbcUsername = "root";
+    private final String jdbcPassword = "";
+
+    // Koneksi ke database
+    protected Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+    }
+
+    // Menambahkan pesan tiket
+    public void insertPesanTiket(PesanTiket tiket) {
+        String sql = "INSERT INTO pesantiket (id_tiket, id_penyelam, id_destinasi, tanggal, waktu, quantity, harga, id_pembayaran) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, tiket.getIdTiket());
+            statement.setInt(2, tiket.getIdPenyelam());
+            statement.setInt(3, tiket.getIdDestinasi());
+            statement.setDate(4, tiket.getTanggal());  // Menggunakan Date secara langsung
+            statement.setInt(5, tiket.getWaktu());
+            statement.setInt(6, tiket.getQuantity());
+            statement.setInt(7, tiket.getHarga());
+
+            // Cek apakah idPembayaran bernilai null
+            if (tiket.getIdPembayaran() != null) {
+                statement.setInt(8, tiket.getIdPembayaran()); // Set ID Pembayaran jika ada
+            } else {
+                statement.setNull(8, java.sql.Types.INTEGER);  // Set NULL jika tidak ada ID Pembayaran
+            }
+
+            statement.executeUpdate();
+            System.out.println("Tiket berhasil dimasukkan ke database.");
+        } catch (SQLException e) {
+            System.err.println("Gagal memasukkan tiket: " + e.getMessage());
+        }
+    }
+
+    // Mendapatkan tiket berdasarkan id (contoh tambahan)
+    public PesanTiket getPesanTiket(int idTiket) {
+        PesanTiket tiket = null;
+        String sql = "SELECT * FROM pesantiket WHERE id_tiket = ?";
+        
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, idTiket);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                tiket = new PesanTiket(
+                    resultSet.getInt("id_tiket"),
+                    resultSet.getInt("id_penyelam"),
+                    resultSet.getInt("id_destinasi"),
+                    resultSet.getDate("tanggal"),
+                    resultSet.getInt("waktu"),
+                    resultSet.getInt("quantity"),
+                    resultSet.getInt("harga"),
+                    resultSet.getInt("id_pembayaran") // Optional
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tiket;
+    }
+    
+    // Metode untuk mendapatkan tiket berdasarkan idPenyelam
+    public List<PesanTiket> getTiketByPenyelam(int idPenyelam) {
+        List<PesanTiket> tiketList = new ArrayList<>();
+        String sql = "SELECT * FROM pesantiket WHERE id_penyelam = ?";  // Query untuk mengambil tiket berdasarkan penyelam
+        
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            
+            preparedStatement.setInt(1, idPenyelam);  // Set ID penyelam
+            ResultSet resultSet = preparedStatement.executeQuery();  // Menjalankan query
+            
+            while (resultSet.next()) {
+                // Membaca data dari result set dan menyimpannya dalam objek PesanTiket
+                PesanTiket tiket = new PesanTiket(
+                    resultSet.getInt("id_tiket"),
+                    resultSet.getInt("id_penyelam"),
+                    resultSet.getInt("id_destinasi"),
+                    resultSet.getDate("tanggal"),
+                    resultSet.getInt("waktu"),
+                    resultSet.getInt("quantity"),
+                    resultSet.getInt("harga"),
+                    resultSet.getInt("id_pembayaran") == 0 ? null : resultSet.getInt("id_pembayaran")  // Menangani nilai null untuk id_pembayaran
+                );
+                tiketList.add(tiket);  // Menambahkan objek tiket ke dalam daftar tiket
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return tiketList;  // Mengembalikan daftar tiket
+    }
+}
