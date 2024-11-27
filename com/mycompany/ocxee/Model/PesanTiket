@@ -85,6 +85,10 @@ public class PesanTiket {
         }
         this.harga = harga;
     }
+    
+    public double getTotalHarga() {
+        return quantity * harga; // Menghitung total harga
+    }
 
     public Integer getIdPembayaran() {
         return idPembayaran;
