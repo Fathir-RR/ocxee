@@ -1,0 +1,98 @@
+package com.mycompany.ocxee.view;
+
+import com.mycompany.ocxee.DAO.DestinasiDAO;
+import com.mycompany.ocxee.DAO.PesanTiketDAO;
+import com.mycompany.ocxee.DAO.PenyelamDAO;
+import com.mycompany.ocxee.controller.PesanTiketController;
+import com.mycompany.ocxee.model.PesanTiket;
+import java.util.Scanner;
+
+public class Beranda {
+    private DestinasiDAO destinasiDAO;
+    private PenyelamDAO penyelamDAO;
+    private PesanTiketDAO pesanTiketDAO;
+    private Scanner scanner;
+
+    public Beranda(PesanTiketDAO pesanTiketDAO, DestinasiDAO destinasiDAO, PenyelamDAO penyelamDAO) {
+        this.destinasiDAO = destinasiDAO;
+        this.penyelamDAO = penyelamDAO;
+        this.pesanTiketDAO = pesanTiketDAO;
+        this.scanner = new Scanner(System.in);
+    }
+
+    public void showBeranda() {
+        while (true) {
+            System.out.println("=== Beranda ===");
+            System.out.println("1. Pesan Tiket");
+            System.out.println("2. Lihat Tiket Saya");
+            System.out.println("3. Lihat Destinasi");
+            System.out.println("4. Log Out");
+            System.out.print("Pilih opsi: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Menyerap newline
+
+            switch (choice) {
+                case 1:
+                    // Redirect ke PesanTiketView untuk booking tiket
+                    PesanTiketView pesanTiketView = new PesanTiketView(new PesanTiketController(pesanTiketDAO));
+                    pesanTiketView.displayForm();
+                    break;
+                case 2:
+                    lihatTiketSaya();
+                    break;
+                case 3:
+                    lihatDestinasi();
+                    break;
+                case 4:
+                    System.out.println("Log out berhasil.");
+                    return;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+            }
+        }
+    }
+
+    private void lihatTiketSaya() {
+        // Menggunakan tiketDAO untuk mengambil tiket yang dipesan oleh penyelam 
+        System.out.print("Masukkan ID Penyelam untuk melihat tiket: ");
+        int idPenyelam = scanner.nextInt();
+        scanner.nextLine(); // Menyerap newline
+        
+        // Mengambil tiket berdasarkan ID penyelam
+        var tiketList = pesanTiketDAO.getTiketByPenyelam(idPenyelam);
+        
+        if (tiketList.isEmpty()) {
+            System.out.println("Anda belum memesan tiket.");
+        } else {
+            for (var tiket : tiketList) {
+                displayTiketDetails(tiket); // Memanggil metode untuk menampilkan detail tiket
+            }
+        }
+    }
+
+    private void displayTiketDetails(PesanTiket tiket) {
+        System.out.println("ID Tiket: " + tiket.getIdTiket());
+        System.out.println("ID Destinasi: " + tiket.getIdDestinasi());
+        System.out.println("Tanggal: " + tiket.getTanggal());
+        System.out.println("Waktu: " + tiket.getWaktu());
+        System.out.println("Jumlah Tiket: " + tiket.getQuantity());
+        System.out.println("Harga: " + tiket.getHarga());
+        System.out.println("---------------------------");
+    }
+
+    private void lihatDestinasi() {
+        try {
+            destinasiDAO.getAllDestinasi().forEach(destinasi -> {
+                System.out.println("ID Destinasi: " + destinasi.getIdDestinasi());
+                System.out.println("Nama Destinasi: " + destinasi.getNamaDestinasi());
+                System.out.println("Kedalaman: " + destinasi.getKedalaman());
+                System.out.println("Flora: " + destinasi.getFlora());
+                System.out.println("Fauna: " + destinasi.getFauna());
+                System.out.println("Pendamping: " + destinasi.getPendamping());
+                System.out.println("---------------------------");
+            });
+        } catch (Exception e) {
+            System.out.println("Terjadi kesalahan saat mengambil data destinasi: " + e.getMessage());
+        }
+    }
+}
